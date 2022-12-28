@@ -1,6 +1,11 @@
- processor 6502
- org  $0801
- dc.b $0c,$08,$0a,$00,$9e,$20,$32,$30,$36,$32,$00,$00,$00
+ include "cartheader.dasm"
+
+; If you want to run this program outside the 8bitworkshop IDE, 
+; delete the above include statement and remove the comment in 
+; the next three lines
+; processor 6502
+; org  $0801
+; dc.b $0c,$08,$0a,$00,$9e,$20,$32,$30,$36,$32,$00,$00,$00
 
 abs_x = $C000
 abs_y = $C008
