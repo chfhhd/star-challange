@@ -1,0 +1,93 @@
+ processor 6502
+ org  $0801
+ dc.b $0c,$08,$0a,$00,$9e,$20,$32,$30,$36,$32,$00,$00,$00
+
+abs_x = $C000
+abs_y = $C008
+
+Start
+	cld		; Clear Decimal flag
+	jsr $e544	; KERNAL CLS
+
+	ldy #-8
+        
+LoopY
+        iny
+        cpy #8
+        beq Stop
+        
+        ldx #-8
+        lda #$0D	; PETSCII {CR}
+	jsr $ffd2       ; KERNAL CHROUT
+
+LoopX	
+	; We need the absolute values of x and y several 
+        ; times per loop, therefore we store them in
+        ; abs_x and abs_y
+	txa
+        jsr Abs		; Get absolute value for x
+        sta abs_x	; and store in abs_x
+        tya
+        jsr Abs		; Get absolute value for y
+        sta abs_y	; and store in abs_y
+               
+	; We can describe the corners by 
+        ; abs(x) AND abs(y) > 0
+If        
+	lda abs_y
+	clc
+	cmp #4
+        bmi ElseIf	; Jump if NOT abs(y) > 4        
+        
+      	lda abs_x	; Still true, same for y...
+        clc
+        cmp #4
+        bmi ElseIf
+        jmp Else
+        
+	; The other cuts are either 
+        ; |y| - |x| > 4 or |x| - |y| > 4
+ElseIf	
+	lda abs_y
+	sbc abs_x	; |y| - |x|
+        clc
+        cmp #4
+        bpl Else
+        
+        lda abs_x
+        sbc abs_y	; |x| - |y|
+        clc
+        cmp #5
+        bpl Else
+                        		
+        ; Condition true, finally print a {SPACE} character
+True	
+        lda #$2A        ; PETSCII {SPACE}
+        jsr $ffd2	; KERNAL CHROUT        
+        jmp EndIf
+
+Else	
+	; Otherwise print an asterisk character
+	lda #$20        ; PETSCII *
+        jsr $ffd2	; KERNAL CHROUT
+EndIf	
+        inx
+        cpx #8
+        bne LoopX
+        
+        jmp LoopY
+
+Stop
+	jmp .
+        
+Abs
+	; Replaces value of A by its absolute value
+        cmp #0
+        bmi Abs_IsNeg
+        rts
+        	
+Abs_IsNeg	
+	eor #$ff
+        clc
+	adc #$01 
+        rts
