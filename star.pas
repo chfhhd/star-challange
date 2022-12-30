@@ -12,8 +12,8 @@ begin
         if (abs(x) > 4) and (abs(y) > 4) or (abs(y) - abs (x) > 4) or (abs(x) - abs (y) > 4) then
             write(' ')
         else
-            write('*');
+            write('*')
     end;
-    writeln('');
-  end;
+    writeln('')
+  end
 end.
